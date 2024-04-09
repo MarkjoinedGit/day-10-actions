@@ -3,3 +3,5 @@ export const STATUS_ORDER = {
     ,AlmostDone:'AlmostDone'
     ,Done:'Done'
 }
+
+export const URL_ENV='http://192.168.40.143:8080'

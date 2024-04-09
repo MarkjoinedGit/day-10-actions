@@ -19,43 +19,24 @@ import {STATUS_ORDER} from '../../../ultils/Const'
 
 const Orders = () => {
   const nevigate = useNavigate()
+  const [orders,setOrders] = useState([])
   const handleOpenHomePage = () =>{
     nevigate('/home')
   }
-
-  const fetchData = async () =>{
-    getOrders().then(response => {
-      console.log(response.data);
-      const jsonString = JSON.stringify(response.data);
-    setOrders([
-      {
-        id:1,
-        name:'ban 01',
-        status:STATUS_ORDER.Processing
-      },
-      {
-        id:2,
-        name:'ban 01',
-        status:STATUS_ORDER.AlmostDone
-      },
-      {
-        id:3,
-        name:'ban 01',
-        status:STATUS_ORDER.Done
-      }
-    ])
-    })
-    .catch(error => {
+  const fetchData = async () => {
+    try {
+      const response = await getOrders();
+      setOrders(response.data); 
+    } catch (error) {
       console.error('Error fetching data:', error);
-    });
-    
-  }
+    }
+  };
 
   const handleFetchOrders = () =>{
     fetchData()
   }
 
-  const [orders,setOrders] = useState([])
+
 
   
   const handleChangeStatusOrder=  async (order)=>{
@@ -71,13 +52,13 @@ const Orders = () => {
         return;
     }
     const paramsString = queryString.stringify({id:order.id,status:status});
-    editOrderStatus(paramsString)
-    .then(response => {
-        console.log('Data posted successfully:', response.data);
-    })
-    .catch(error => {
-        console.error('Error posting data:', error);
-    });
+    try {
+      const response = await editOrderStatus(paramsString);
+     setOrders(response.data)
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   }
 
   const renderButton = (order) => {
@@ -116,8 +97,8 @@ const Orders = () => {
         </Button>
         <List spacing={3} className='orders'>
         {orders.map((order) => (
-            <ListItem className='order--item'>
-                {order.name}
+            <ListItem key={order.id} className='order--item'>
+                {order.id}
                 {renderButton(order)}
                 <Button leftIcon={<ViewIcon />} colorScheme='teal' variant='solid' onClick={()=>handleChangeStatusOrder(order)}>
                   <Link to={{ pathname: '/order-details', state: { order } }}>Details</Link>

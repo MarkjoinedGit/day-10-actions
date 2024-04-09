@@ -1,45 +1,45 @@
 import random
 from flask import Flask, Response, request, jsonify
-
+from flask_cors import CORS
 app = Flask(__name__)
-
+CORS(app)
 counter = 0
 
-orders = []
 food=[
     {
-        "id": 1,
+        "id": 'F001',
         "name": "Hamburger",
         "image":"image\hamburger.jpg"
     },
     {
-        "id": 2,
+        "id": 'F002',
         "name": "Pho bo",
         "image":"image\phobo.jpg"
     },
     {
-        "id": 3,
+        "id": 'F003',
         "name": "Rice chicken",
         "image":"image\comga.jpg"
     }
 ]
-menu=[
+
+orders=[
     {
-        "id": 1,
-        "advertisingID": "1",
-        "items": ["dish 1", "dish 2", "dish 3"],
+        "id": 'O001',
+        "advertisingID": "fffff:0000:1234",
+        "items": ['F002', 'F003'],
         "status": "Processing"
     },
     {
-        "id": 2,
-        "advertisingID": "2",
-        "items": ["dish A", "dish B", "dish C"],
-        "status": "almost done"
+        "id": 'O002',
+        "advertisingID": "fffff:0000:1834",
+        "items": ['F001', 'F003'],
+        "status": "AlmostDone"
     },
     {
-        "id": 3,
-        "advertisingID": "3",
-        "items": ["dish X", "dish Y", "dish Z"],
+        "id": 'O003',
+        "advertisingID": "fffff:0000:1934",
+        "items": ['F001','F002','F003'],
         "status": "Done"
     }
 ]
@@ -48,23 +48,7 @@ menu=[
 def getFood():
     return jsonify(
             {
-                'food': [
-                {
-                    "id": 1,
-                    "name": "Hamburger",
-                    "image":"image/hamburger.jpg"
-                },
-                {
-                    "id": 2,
-                    "name": "Pho bo",
-                    "image":"image/phobo.jpg"
-                },
-                {
-                    "id": 3,
-                    "name": "Rice chicken",
-                    "image":"image/comga.jpg"
-                }                                       
-                ],
+                'food': food,
                 'result': 'success'
             }
     )
@@ -91,20 +75,18 @@ def submit_order():
     else:
         return jsonify({'error': 'Thiếu thông tin cần thiết'}), 400
     
-@app.route('/menu/get_detail', methods=['GET'])
-def get_menu_item_by_id():
-    item_id = request.args.get('id')
-    if item_id is not None:
-        try:
-            item_id = int(item_id)
-            item = next((i for i in menu if i['id'] == item_id), None)
-            if item:
-                return jsonify({'item': item})
-            else:
-                return jsonify({'message': 'Menu item not found', 'result': 'failure'}), 404
-        except ValueError:
-            return jsonify({'message': 'Invalid item id', 'result': 'failure'}), 400
-    else:
-        return jsonify({'message': 'Item id is missing', 'result': 'failure'}), 400
+    
+@app.route('/orders/get-all', methods=['GET'])
+def getAllOrders():
+    return jsonify(orders)
+
+@app.route('/orders/change-status', methods=['GET'])
+def changeOrderStatus():
+    order_id = request.args.get('id')
+    status = request.args.get('status')
+    for order in orders:
+        if order['id'] == order_id:
+            order['status'] = status
+    return jsonify(orders)
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='192.168.40.143', port=8080)
