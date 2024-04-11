@@ -11,20 +11,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
+import com.example.day_10_action_app.fragment.FoodOrderFragment;
+import com.example.day_10_action_app.fragment.MyItemRecyclerViewAdapter;
+import com.example.day_10_action_app.fragment.placeholder.PlaceholderContent;
 import com.example.day_10_action_app.socket.OrderSocket;
 import com.example.day_10_action_app.utility.ServerUtility;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import org.chromium.net.CronetEngine;
 import org.chromium.net.CronetException;
@@ -38,12 +36,14 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
     private OrderSocket orderSocket;
-    private Context context = this;
+    private int FOOD_NAME_INDEX = 0;
+    private int FOOD_NAME_COUNT = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,45 +125,59 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPlaceOrder(View view) throws JSONException {
 
+
         fetchAdvertisingId(new AdsIdCallback() {
            @Override
            public void onAdsIdReceived(String adsId) throws JSONException {
-               JSONObject orderJson = new JSONObject();
-               orderJson.put("advertisingID", adsId);
+               FoodOrderFragment fragment = (FoodOrderFragment) getSupportFragmentManager().findFragmentById(R.id.food_list);
 
-               JSONArray orderItemsArray = new JSONArray();
+               if (fragment != null) {
+                   List<PlaceholderContent.PlaceholderItem> items = fragment.getItems();
+                   Log.i("items", items.toString());
+                   JSONObject orderJson = new JSONObject();
+                   orderJson.put("advertisingID", adsId);
+                   JSONArray orderItemsArray = new JSONArray();
 
-               JSONObject item1 = new JSONObject();
-               item1.put("name", "phobo");
-               orderItemsArray.put(item1);
-
-               orderJson.put("items", orderItemsArray);
-               postOrder(orderJson, new UrlRequest.Callback() {
-                   @Override
-                   public void onRedirectReceived(UrlRequest request, UrlResponseInfo info, String newLocationUrl) throws Exception {
-
+                   for(PlaceholderContent.PlaceholderItem item:items) {
+                       int count = Integer.parseInt(item.foodDetail.get(FOOD_NAME_COUNT));
+                       if(count > 0) {
+                           JSONObject itemJS = new JSONObject();
+                           itemJS.put("name", item.foodDetail.get(FOOD_NAME_INDEX));
+                           itemJS.put("count", item.foodDetail.get(FOOD_NAME_COUNT));
+                           orderItemsArray.put(itemJS);
+                           Log.i("orders", orderItemsArray.toString());
+                       }
                    }
 
-                   @Override
-                   public void onResponseStarted(UrlRequest request, UrlResponseInfo info) throws Exception {
+                   orderJson.put("items", orderItemsArray);
+                   postOrder(orderJson, new UrlRequest.Callback() {
+                       @Override
+                       public void onRedirectReceived(UrlRequest request, UrlResponseInfo info, String newLocationUrl) throws Exception {
 
-                   }
+                       }
 
-                   @Override
-                   public void onReadCompleted(UrlRequest request, UrlResponseInfo info, ByteBuffer byteBuffer) throws Exception {
+                       @Override
+                       public void onResponseStarted(UrlRequest request, UrlResponseInfo info) throws Exception {
 
-                   }
+                       }
 
-                   @Override
-                   public void onSucceeded(UrlRequest request, UrlResponseInfo info) {
+                       @Override
+                       public void onReadCompleted(UrlRequest request, UrlResponseInfo info, ByteBuffer byteBuffer) throws Exception {
 
-                   }
+                       }
 
-                   @Override
-                   public void onFailed(UrlRequest request, UrlResponseInfo info, CronetException error) {
+                       @Override
+                       public void onSucceeded(UrlRequest request, UrlResponseInfo info) {
 
-                   }
-               });
+                       }
+
+                       @Override
+                       public void onFailed(UrlRequest request, UrlResponseInfo info, CronetException error) {
+
+                       }
+                   });
+
+               }
            }
        });
     }

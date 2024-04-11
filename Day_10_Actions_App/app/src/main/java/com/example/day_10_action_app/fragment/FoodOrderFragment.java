@@ -37,6 +37,7 @@ public class FoodOrderFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private MyItemRecyclerViewAdapter adapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -78,7 +79,8 @@ public class FoodOrderFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(PlaceholderContent.ITEMS, this));
+            adapter = new MyItemRecyclerViewAdapter(PlaceholderContent.ITEMS, this);
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }
@@ -94,17 +96,16 @@ public class FoodOrderFragment extends Fragment {
                                 (jsonObject -> {
                                     try {
                                         JSONArray placesArray = jsonObject.getJSONArray("food");
-                                        // Lặp qua mỗi đối tượng trong mảng places
                                         for (int i = 0; i < placesArray.length(); i++) {
                                             JSONObject placeObject = placesArray.getJSONObject(i);
-                                            List<String> foodList = new ArrayList<>();
-                                            // Lấy các trường thông tin của địa điểm
+                                            List<String> foodDetail = new ArrayList<>();
                                             int id = placeObject.getInt("id");
                                             String food_name = placeObject.getString("name");
                                             String thumbUrl = placeObject.getString("image");
-                                            foodList.add(food_name);
-                                            foodList.add(thumbUrl);
-                                            PlaceholderContent.addItem(PlaceholderContent.createPlaceholderItem(id, foodList));
+                                            foodDetail.add(food_name);
+                                            foodDetail.add(thumbUrl);
+                                            foodDetail.add("0");
+                                            PlaceholderContent.addItem(PlaceholderContent.createPlaceholderItem(id, foodDetail));
                                         }
                                     } catch (JSONException e) {
                                         throw new RuntimeException(e);
@@ -115,4 +116,9 @@ public class FoodOrderFragment extends Fragment {
 
         urlReq.start();
     }
+
+    public List<PlaceholderContent.PlaceholderItem> getItems() {
+        return adapter.getItems();
+    }
+
 }
