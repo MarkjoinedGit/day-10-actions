@@ -1,9 +1,11 @@
 import random
 from flask import Flask, Response, request, jsonify, send_from_directory
 from flask_sock import Sock
+from flask_cors import CORS
 import json
 
 app = Flask(__name__)
+CORS(app)
 sock = Sock(app)
 
 counter = 0
@@ -108,5 +110,22 @@ def submit_order():
 def getAllOrders():
     return jsonify(orders)    
 
+@app.route('/orders/change-status', methods=['GET'])
+def changeOrderStatus():
+    order_id = request.args.get('id')
+    advertising_id = request.args.get('advertising_id')
+    status = request.args.get('status')
+    for order in orders:
+        if order['id'] == int(order_id):
+            order['status'] = status
+           
+    response = {'msg': f'Your order {order_id} is on {status}.'}
+    ws = ws_clients.get(advertising_id)
+    if ws:
+        ws.send(response["msg"])
+    return jsonify({
+        'success':True,
+        'orders':orders
+    })
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='172.16.1.189', port=8080)
