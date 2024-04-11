@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.example.day_10_action_app.R;
 import com.example.day_10_action_app.fragment.placeholder.PlaceholderContent;
 import com.example.day_10_action_app.reqcallback.FoodOrderReqCallback;
+import com.example.day_10_action_app.utility.ServerUtility;
 
 import org.chromium.net.CronetEngine;
 import org.chromium.net.UrlRequest;
@@ -88,7 +89,7 @@ public class FoodOrderFragment extends Fragment {
         CronetEngine.Builder builder = new CronetEngine.Builder(this.requireContext());
         CronetEngine engine = builder.build();
 
-        UrlRequest urlReq = engine.newUrlRequestBuilder("http://172.16.30.245:8080/food",
+        UrlRequest urlReq = engine.newUrlRequestBuilder(ServerUtility.getServerUrl() + "food",
                         new FoodOrderReqCallback(
                                 (jsonObject -> {
                                     try {

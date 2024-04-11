@@ -11,8 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.day_10_action_app.R;
 import com.example.day_10_action_app.fragment.placeholder.PlaceholderContent.PlaceholderItem;
 import com.example.day_10_action_app.databinding.FragmentFoodOrderBinding;
+import com.example.day_10_action_app.utility.ServerUtility;
 
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).id);
         holder.mFoodName.setText(mValues.get(position).foodList.get(0));
-        String thumbUrl = "http://172.16.30.245:8080/" + mValues.get(position).foodList.get(1);
+        String thumbUrl = ServerUtility.getServerUrl() + mValues.get(position).foodList.get(1);
         Glide.with(mFragment)
                 .load(thumbUrl)
                 .into(holder.mThumbnail);holder.mItem = mValues.get(position);

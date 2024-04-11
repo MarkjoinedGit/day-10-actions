@@ -39,7 +39,6 @@
             android:textAppearance="?attr/textAppearanceListItem"
             tools:layout_editor_absoluteY="16dp"/>
 
-
         <Button
             android:id="@+id/placeOrder"
             android:layout_width="match_parent"
