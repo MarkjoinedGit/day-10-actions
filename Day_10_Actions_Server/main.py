@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 sock = Sock(app)
 
-counter = 0
+counter = 3
 
 orders = []
 wses = []
@@ -97,7 +97,7 @@ def submit_order():
         items = data['items']
         counter += 1
         id = counter
-        orders.append({'id': id, 'advertisingID': advertising_id, 'items': items, 'status': 'On processing'})
+        orders.append({'id': id, 'advertisingID': advertising_id, 'items': items, 'status': 'Processing'})
         response = {'msg': f'Your order {id} is on processing.'}
         ws = ws_clients.get(advertising_id)
         if ws:
@@ -128,4 +128,4 @@ def changeOrderStatus():
         'orders':orders
     })
 if __name__ == '__main__':
-    app.run(host='172.16.1.189', port=8080)
+    app.run(host='0.0.0.0', port=8080)

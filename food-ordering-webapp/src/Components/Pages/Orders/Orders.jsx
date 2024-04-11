@@ -49,7 +49,7 @@ const Orders = () => {
       default:
         return;
     }
-    const paramsString = queryString.stringify({id:order.id,advertising_id:order.advertising_id,status:status});
+    const paramsString = queryString.stringify({id:order.id,advertising_id:order.advertisingID,status:status});
     try {
       const response = await editOrderStatus(paramsString);
       console.log(response.data)
