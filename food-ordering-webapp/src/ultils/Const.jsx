@@ -4,4 +4,4 @@ export const STATUS_ORDER = {
     ,Done:'Done'
 }
 
-export const URL_ENV='http://192.168.40.143:8080'
+export const URL_ENV='http://172.16.1.189:8080'

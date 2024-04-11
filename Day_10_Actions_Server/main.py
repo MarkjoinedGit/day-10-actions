@@ -1,48 +1,58 @@
 import random
-from flask import Flask, Response, request, jsonify
+from flask import Flask, Response, request, jsonify, send_from_directory
+from flask_sock import Sock
 from flask_cors import CORS
+import json
+
 app = Flask(__name__)
 CORS(app)
+sock = Sock(app)
+
 counter = 0
+
+orders = []
+wses = []
+ws_clients = {}
 
 food=[
     {
-        "id": 'F001',
+        "id": 1,
         "name": "Hamburger",
-        "image":"image\hamburger.jpg"
+        "image":"image/hamburger.png"
     },
     {
-        "id": 'F002',
+        "id": 2,
         "name": "Pho bo",
-        "image":"image\phobo.jpg"
+        "image":"image/phobo.jpg"
     },
     {
-        "id": 'F003',
+        "id": 3,
         "name": "Rice chicken",
-        "image":"image\comga.jpg"
+        "image":"image/comga.jpg"
     }
 ]
 
 orders=[
     {
-        "id": 'O001',
+        "id": 1,
         "advertisingID": "fffff:0000:1234",
-        "items": ['F002', 'F003'],
+        "items": ['Pho bo', 'Rice chicken'],
         "status": "Processing"
     },
     {
-        "id": 'O002',
+        "id": 2,
         "advertisingID": "fffff:0000:1834",
-        "items": ['F001', 'F003'],
+        "items": ['Hamburger', 'Rice chicken'],
         "status": "AlmostDone"
     },
     {
-        "id": 'O003',
+        "id": 3,
         "advertisingID": "fffff:0000:1934",
-        "items": ['F001','F002','F003'],
+        "items": ['Hamburger','Pho bo','Rice chicken'],
         "status": "Done"
     }
 ]
+
 
 @app.route('/food',methods=['GET'])
 def getFood():
@@ -53,40 +63,69 @@ def getFood():
             }
     )
 
+@sock.route('/getOrder')
+def getOrder(ws):
+    wses.append(ws)
+    adsId = None
+    while True:
+        data = ws.receive(30)
+        if data:
+            #ws.send(data)
+            try:
+                data_dict = json.loads(data)
+                adsId = data_dict.get('adsId')
+                if adsId:
+                    ws_clients[adsId] = ws
+            except json.JSONDecodeError:
+                pass
+        else:
+            break
+
+@app.route('/image/<path:path>')
+def send_asset(path):
+    return send_from_directory('image', path)
+
 
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
-    global counter
 
+    global counter
     data = request.get_json()
 
     if 'advertisingID' in data and 'items' in data:
         advertising_id = data['advertisingID']
         items = data['items']
-
         counter += 1
         id = counter
-        
-        orders.append({'id': id, 'advertisingID': advertising_id, 'items': items, 'status': 'Đang xử lý'})
-        
-        response = {'message': f'Đơn hàng {id} của bạn đang xử lý.'}
-        
-        return jsonify(response), 200
-    else:
-        return jsonify({'error': 'Thiếu thông tin cần thiết'}), 400
-    
+        orders.append({'id': id, 'advertisingID': advertising_id, 'items': items, 'status': 'On processing'})
+        response = {'msg': f'Your order {id} is on processing.'}
+        ws = ws_clients.get(advertising_id)
+        if ws:
+            ws.send(response["msg"])
+        return jsonify({
+            'success':True
+        })
     
 @app.route('/orders/get-all', methods=['GET'])
 def getAllOrders():
-    return jsonify(orders)
+    return jsonify(orders)    
 
 @app.route('/orders/change-status', methods=['GET'])
 def changeOrderStatus():
     order_id = request.args.get('id')
+    advertising_id = request.args.get('advertising_id')
     status = request.args.get('status')
     for order in orders:
-        if order['id'] == order_id:
+        if order['id'] == int(order_id):
             order['status'] = status
-    return jsonify(orders)
+           
+    response = {'msg': f'Your order {order_id} is on {status}.'}
+    ws = ws_clients.get(advertising_id)
+    if ws:
+        ws.send(response["msg"])
+    return jsonify({
+        'success':True,
+        'orders':orders
+    })
 if __name__ == '__main__':
-    app.run(host='192.168.40.143', port=8080)
+    app.run(host='172.16.1.189', port=8080)

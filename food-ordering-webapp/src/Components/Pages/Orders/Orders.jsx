@@ -27,6 +27,7 @@ const Orders = () => {
     try {
       const response = await getOrders();
       setOrders(response.data); 
+      console.log(response.data)
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -36,9 +37,6 @@ const Orders = () => {
     fetchData()
   }
 
-
-
-  
   const handleChangeStatusOrder=  async (order)=>{
     let status =''
     switch (order.status){
@@ -51,11 +49,13 @@ const Orders = () => {
       default:
         return;
     }
-    const paramsString = queryString.stringify({id:order.id,status:status});
+    const paramsString = queryString.stringify({id:order.id,advertising_id:order.advertising_id,status:status});
     try {
       const response = await editOrderStatus(paramsString);
-     setOrders(response.data)
-
+      console.log(response.data)
+      if (response.data.success === true){
+        setOrders(response.data.orders)
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -107,7 +107,6 @@ const Orders = () => {
         ))}
         </List>
     </VStack>
-    
   );
 }
 
