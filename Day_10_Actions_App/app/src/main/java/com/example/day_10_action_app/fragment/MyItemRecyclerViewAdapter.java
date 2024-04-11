@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -44,12 +45,35 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).id);
-        holder.mFoodName.setText(mValues.get(position).foodList.get(0));
-        String thumbUrl = ServerUtility.getServerUrl() + mValues.get(position).foodList.get(1);
+        holder.mFoodName.setText(mValues.get(position).foodDetail.get(0));
+        holder.mCount.setText(mValues.get(position).foodDetail.get(2));
+        String thumbUrl = ServerUtility.getServerUrl() + mValues.get(position).foodDetail.get(1);
         Glide.with(mFragment)
                 .load(thumbUrl)
                 .into(holder.mThumbnail);holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).id);
+
+        holder.mMinusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count = Integer.parseInt((String) holder.mCount.getText());
+                if(count > 0) {
+                    count-=1;
+                    holder.mCount.setText(String.valueOf(count));
+                    mValues.get(holder.getAdapterPosition()).foodDetail.set(2, String.valueOf(count));
+                }
+            }
+        });
+
+        holder.mPlusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int count = Integer.parseInt((String) holder.mCount.getText());
+                count+=1;
+                holder.mCount.setText(String.valueOf(count));
+                mValues.get(holder.getAdapterPosition()).foodDetail.set(2, String.valueOf(count));
+            }
+        });
     }
 
     @Override
@@ -57,17 +81,27 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         return mValues.size();
     }
 
+    public List<PlaceholderItem> getItems() {
+        return mValues;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public  final TextView mFoodName;
         public PlaceholderItem mItem;
         public ImageView mThumbnail;
+        public Button mMinusBtn;
+        public Button mPlusBtn;
+        public TextView mCount;
 
         public ViewHolder(FragmentFoodOrderBinding binding) {
             super(binding.getRoot());
             mIdView = binding.itemNumber;
             mFoodName = binding.foodName;
-            mThumbnail =binding.foodThumbnail;
+            mThumbnail = binding.foodThumbnail;
+            mMinusBtn = binding.minusBtn;
+            mPlusBtn = binding.plusBtn;
+            mCount = binding.countFood;
         }
 
         @Override

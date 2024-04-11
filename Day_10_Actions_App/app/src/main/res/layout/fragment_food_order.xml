@@ -9,26 +9,21 @@
     android:layout_marginBottom="50dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:flow_verticalAlign="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:orientation="vertical"
-        app:flow_verticalAlign="center">
-
-        <TextView
-            android:id="@+id/food_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:textAppearance="?attr/textAppearanceListItem"
-            tools:layout_editor_absoluteY="16dp"/>
+        android:layout_margin="20dp">
 
         <ImageView
             android:id="@+id/food_thumbnail"
-            android:layout_width="256dp"
-            android:layout_height="256dp"/>
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="Food thumbnail" />
+
 
         <TextView
             android:id="@+id/item_number"
@@ -37,17 +32,55 @@
             android:layout_margin="@dimen/text_margin"
             android:textAlignment="center"
             android:textAppearance="?attr/textAppearanceListItem"
-            tools:layout_editor_absoluteY="16dp"/>
+            tools:layout_editor_absoluteY="16dp"
+            android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/placeOrder"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:onClick="onPlaceOrder"
-            android:backgroundTint="@color/black"
-            android:text="Place order"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/food_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:textAppearance="?attr/textAppearanceListItem"
+                tools:layout_editor_absoluteY="16dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp">
+
+                <Button
+                    android:id="@+id/minusBtn"
+                    android:layout_width="66dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:layout_marginRight="20dp"/>
+
+                <TextView
+                    android:id="@+id/countFood"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="20sp"/>
+
+                <Button
+                    android:id="@+id/plusBtn"
+                    android:layout_width="66dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="+"
+                    android:textSize="20sp"
+                    android:layout_marginLeft="20dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

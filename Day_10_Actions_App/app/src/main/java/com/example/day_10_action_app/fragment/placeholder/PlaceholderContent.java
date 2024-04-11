@@ -37,8 +37,8 @@ public class PlaceholderContent {
         ITEM_MAP.put(item.id, item);
     }
 
-    public static PlaceholderItem createPlaceholderItem(int position, List<String> foodList) {
-        return new PlaceholderItem(String.valueOf(position), foodList, makeDetails(position));
+    public static PlaceholderItem createPlaceholderItem(int position, List<String> foodDetail) {
+        return new PlaceholderItem(String.valueOf(position), foodDetail, makeDetails(position));
     }
 
     private static String makeDetails(int position) {
@@ -55,16 +55,16 @@ public class PlaceholderContent {
      */
     public static class PlaceholderItem {
         public final String id;
-        public List<String> foodList;
+        public List<String> foodDetail;
 
-        public PlaceholderItem(String id, List<String> foodList, String detail) {
+        public PlaceholderItem(String id, List<String> foodDetail, String detail) {
             this.id = id;
-            this.foodList = foodList;
+            this.foodDetail = foodDetail;
         }
 
         @Override
         public String toString() {
-            return this.foodList.get(2);
+            return this.foodDetail.get(2);
         }
     }
 }
