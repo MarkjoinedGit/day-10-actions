@@ -1,10 +1,14 @@
 package com.example.day_10_action_app;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -15,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.day_10_action_app.fragment.FoodOrderFragment;
@@ -23,6 +28,7 @@ import com.example.day_10_action_app.fragment.placeholder.PlaceholderContent;
 import com.example.day_10_action_app.socket.OrderSocket;
 import com.example.day_10_action_app.utility.ServerUtility;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.material.navigation.NavigationView;
 
 import org.chromium.net.CronetEngine;
 import org.chromium.net.CronetException;
@@ -39,7 +45,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private OrderSocket orderSocket;
     private int FOOD_NAME_INDEX = 0;
@@ -49,6 +55,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawerLayout = findViewById(R.id.drawer);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer,
+                R.string.close_drawer);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navView = findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -203,5 +221,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.about_us) {
+            startActivity(new Intent(this, AboutUsActivity.class));
+        }
+        return false;
     }
 }

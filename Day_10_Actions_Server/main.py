@@ -36,20 +36,42 @@ orders=[
     {
         "id": 1,
         "advertisingID": "fffff:0000:1234",
-        "items": ['Pho bo', 'Rice chicken'],
+        "items": 
+            [
+                {
+                    'name': 'Pho bo', 
+                    'count':'1'
+                },
+                {
+                    'name': 'Hamburger', 
+                    'count':'2'
+                },
+            ],
         "status": "Processing"
     },
     {
         "id": 2,
-        "advertisingID": "fffff:0000:1834",
-        "items": ['Hamburger', 'Rice chicken'],
-        "status": "AlmostDone"
+        "advertisingID": "fffff:0000:1234",
+        "items": 
+            [      
+                {
+                    'name': 'Rice chicken', 
+                    'count':'8'
+                },
+            ],
+        "status": "Processing"
     },
     {
         "id": 3,
-        "advertisingID": "fffff:0000:1934",
-        "items": ['Hamburger','Pho bo','Rice chicken'],
-        "status": "Done"
+        "advertisingID": "fffff:0000:1234",
+        "items": 
+            [
+                {
+                    'name': 'Pho bo', 
+                    'count':'3'
+                }
+            ],
+        "status": "Processing"
     }
 ]
 
