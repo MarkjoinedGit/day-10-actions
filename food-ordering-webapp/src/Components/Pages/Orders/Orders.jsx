@@ -1,19 +1,16 @@
 import {useState,useEffect} from 'react';
-import { useNavigate,Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import {
     List,
     ListItem,
-    ListIcon,
-    OrderedList,
-    UnorderedList,
+    HStack,
+    VStack,
+    Button
   } from '@chakra-ui/react'
-import { CheckIcon, ExternalLinkIcon,SpinnerIcon,ArrowBackIcon,ViewIcon } from '@chakra-ui/icons'
-import { Button, ButtonGroup } from '@chakra-ui/react'
+import { CheckIcon, ExternalLinkIcon,SpinnerIcon,ArrowBackIcon } from '@chakra-ui/icons'
 import './Orders.css'
 import { getOrders,editOrderStatus } from '../../../Services/OrdersService';
-import { Container } from '@chakra-ui/react'
-import { Stack, HStack, VStack } from '@chakra-ui/react'
 import {STATUS_ORDER} from '../../../ultils/Const'
 
 
@@ -32,6 +29,9 @@ const Orders = () => {
       console.error('Error fetching data:', error);
     }
   };
+  useEffect(()=>{
+    fetchData()
+  },[])
 
   const handleFetchOrders = () =>{
     fetchData()
@@ -66,13 +66,13 @@ const Orders = () => {
       case STATUS_ORDER.Processing:
         return (
           <Button leftIcon={<ExternalLinkIcon />} colorScheme='orange' variant='solid' onClick={()=>handleChangeStatusOrder(order)}>
-            {order.status}
+            {STATUS_ORDER.AlmostDone}
           </Button>
         );
       case STATUS_ORDER.AlmostDone:
         return (
           <Button leftIcon={<CheckIcon />} colorScheme='teal' variant='solid' onClick={()=>handleChangeStatusOrder(order)}>
-            {order.status}
+            {STATUS_ORDER.Done}
           </Button>
         );
       default:
@@ -96,16 +96,22 @@ const Orders = () => {
           Fetch Orders
         </Button>
         <List spacing={3} className='orders'>
-        {orders.map((order) => (
-            <ListItem key={order.id} className='order--item'>
-                {order.id}
-                {renderButton(order)}
-                <Button leftIcon={<ViewIcon />} colorScheme='teal' variant='solid' onClick={()=>handleChangeStatusOrder(order)}>
-                  <Link to={{ pathname: '/order-details', state: { order } }}>Details</Link>
-                </Button>
-            </ListItem>
-        ))}
-        </List>
+  {orders.map((order) => (
+    order.status !== STATUS_ORDER.Done && (
+      <ListItem key={order.id} className='order--item'>
+        <HStack>
+          <p>ID: {order.id} |</p>
+          {order.items.map((item) => (
+            <p key={item.name}>
+              {item.name}: {item.count},
+            </p>
+          ))}
+        </HStack>
+        {renderButton(order)}
+      </ListItem>
+    )
+  ))}
+</List>
     </VStack>
   );
 }

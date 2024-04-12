@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Orders from './Components/Pages/Orders';
-import Order from './Components/Pages/Order';
-import Home from './Components/Pages/Home'
+import Home from './Components/Pages/Home';
 function App() {
   return (
     <div className="App">

@@ -1,5 +1,13 @@
 <resources>
-    <string name="app_name">Day_10_Action_App</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="app_name">Food Ordering</string>
+    <string name="open_drawer">Mở menu</string>
+    <string name="close_drawer">Đóng menu</string>
+    <string name="leader">Mai Anh Khoa</string>
+    <string name="member01">Nguyễn Trường An</string>
+    <string name="member02">Huỳnh Minh Đức</string>
+    <string name="leader_id">21110836</string>
+    <string name="member01_id">21110117</string>
+    <string name="member02_id">21110168</string>
+    <string name="back">Back</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
