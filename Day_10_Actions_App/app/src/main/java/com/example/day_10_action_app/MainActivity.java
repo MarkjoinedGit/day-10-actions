@@ -50,7 +50,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private OrderSocket orderSocket;
     private final int FOOD_NAME_INDEX = 0;
@@ -74,6 +74,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
 
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+        String appScheme = String.valueOf(R.string.app_scheme);
+
+        if (data != null && appScheme.equals(data.getScheme())) {
+            Log.i("APP SCHEME", "ocee");
+        }
         Runnable addShortcutRunnable = createShortcutAboutUs();
 
         // Tạo một luồng công việc mới và chạy Runnable trên đó
@@ -85,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStart() {
         super.onStart();
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel("order", "Order", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel("order", "Order",
+                    NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription("Day la thong bao ve don hang");
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
@@ -94,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fetchAdvertisingId(adsId -> {
             orderSocket = new OrderSocket(ServerUtility.getSocketUrl() + "getOrder", adsId);
             orderSocket.connect((msg) -> {
-                //Log.i("ws", msg);
+                // Log.i("ws", msg);
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "order");
                 builder.setSmallIcon(R.color.white);
                 builder.setContentTitle("Your order");
@@ -102,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
 
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[] { Manifest.permission.POST_NOTIFICATIONS }, 1);
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == 0)
                     manager.notify(1, builder.build());
             });
@@ -120,7 +129,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             aboutIntent.setAction(Intent.ACTION_MAIN);
             aboutIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, aboutIntent, PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, aboutIntent,
+                    PendingIntent.FLAG_IMMUTABLE);
 
             ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(MainActivity.this, "about_shortcut")
                     .setShortLabel("Về chúng tôi")
@@ -137,7 +147,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void run() {
                 try {
-                    final AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(getApplicationContext());
+                    final AdvertisingIdClient.Info adInfo = AdvertisingIdClient
+                            .getAdvertisingIdInfo(getApplicationContext());
 
                     final String adId = adInfo.getId();
                     Log.d("AdvertisingId", "Advertising ID: " + adId);
@@ -178,22 +189,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             for (PlaceholderContent.PlaceholderItem item : items) {
                 int count = Integer.parseInt(item.foodDetail.get(FOOD_NAME_COUNT));
                 if (count > 0) {
-                    listItem.append(item.foodDetail.get(FOOD_NAME_INDEX)).append(" x").append(item.foodDetail.get(FOOD_NAME_COUNT)).append(" \n");
+                    listItem.append(item.foodDetail.get(FOOD_NAME_INDEX)).append(" x")
+                            .append(item.foodDetail.get(FOOD_NAME_COUNT)).append(" \n");
                 }
             }
-            MaterialAlertDialogBuilder builder =
-                    new MaterialAlertDialogBuilder(this)
-                            .setTitle("Confirm your order")
-                            .setMessage(listItem)
-                            .setPositiveButton("Yes", (dialog, which) -> {
-                                        try {
-                                            onPlaceOrder(view);
-                                        } catch (JSONException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    }
-                            )
-                            .setNegativeButton("No", (dialog, which) -> getSnackBar());
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this)
+                    .setTitle("Confirm your order")
+                    .setMessage(listItem)
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        try {
+                            onPlaceOrder(view);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .setNegativeButton("No", (dialog, which) -> getSnackBar());
             builder.show();
         }
     }
@@ -204,61 +214,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void onPlaceOrder(View view) throws JSONException {
 
-
         fetchAdvertisingId(new AdsIdCallback() {
-           @Override
-           public void onAdsIdReceived(String adsId) throws JSONException {
-               FoodOrderFragment fragment = (FoodOrderFragment) getSupportFragmentManager().findFragmentById(R.id.food_list);
+            @Override
+            public void onAdsIdReceived(String adsId) throws JSONException {
+                FoodOrderFragment fragment = (FoodOrderFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.food_list);
 
-               if (fragment != null) {
-                   List<PlaceholderContent.PlaceholderItem> items = fragment.getItems();
-                   Log.i("items", items.toString());
-                   JSONObject orderJson = new JSONObject();
-                   orderJson.put("advertisingID", adsId);
-                   JSONArray orderItemsArray = new JSONArray();
+                if (fragment != null) {
+                    List<PlaceholderContent.PlaceholderItem> items = fragment.getItems();
+                    Log.i("items", items.toString());
+                    JSONObject orderJson = new JSONObject();
+                    orderJson.put("advertisingID", adsId);
+                    JSONArray orderItemsArray = new JSONArray();
 
-                   for(PlaceholderContent.PlaceholderItem item:items) {
-                       int count = Integer.parseInt(item.foodDetail.get(FOOD_NAME_COUNT));
-                       if(count > 0) {
-                           JSONObject itemJS = new JSONObject();
-                           itemJS.put("name", item.foodDetail.get(FOOD_NAME_INDEX));
-                           itemJS.put("count", item.foodDetail.get(FOOD_NAME_COUNT));
-                           orderItemsArray.put(itemJS);
-                           Log.i("orders", orderItemsArray.toString());
-                       }
-                   }
+                    for (PlaceholderContent.PlaceholderItem item : items) {
+                        int count = Integer.parseInt(item.foodDetail.get(FOOD_NAME_COUNT));
+                        if (count > 0) {
+                            JSONObject itemJS = new JSONObject();
+                            itemJS.put("name", item.foodDetail.get(FOOD_NAME_INDEX));
+                            itemJS.put("count", item.foodDetail.get(FOOD_NAME_COUNT));
+                            orderItemsArray.put(itemJS);
+                            Log.i("orders", orderItemsArray.toString());
+                        }
+                    }
 
-                   orderJson.put("items", orderItemsArray);
-                   postOrder(orderJson, new UrlRequest.Callback() {
-                       @Override
-                       public void onRedirectReceived(UrlRequest request, UrlResponseInfo info, String newLocationUrl) throws Exception {
+                    orderJson.put("items", orderItemsArray);
+                    postOrder(orderJson, new UrlRequest.Callback() {
+                        @Override
+                        public void onRedirectReceived(UrlRequest request, UrlResponseInfo info, String newLocationUrl)
+                                throws Exception {
 
-                       }
+                        }
 
-                       @Override
-                       public void onResponseStarted(UrlRequest request, UrlResponseInfo info) throws Exception {
+                        @Override
+                        public void onResponseStarted(UrlRequest request, UrlResponseInfo info) throws Exception {
 
-                       }
+                        }
 
-                       @Override
-                       public void onReadCompleted(UrlRequest request, UrlResponseInfo info, ByteBuffer byteBuffer) throws Exception {
+                        @Override
+                        public void onReadCompleted(UrlRequest request, UrlResponseInfo info, ByteBuffer byteBuffer)
+                                throws Exception {
 
-                       }
+                        }
 
-                       @Override
-                       public void onSucceeded(UrlRequest request, UrlResponseInfo info) {
+                        @Override
+                        public void onSucceeded(UrlRequest request, UrlResponseInfo info) {
 
-                       }
+                        }
 
-                       @Override
-                       public void onFailed(UrlRequest request, UrlResponseInfo info, CronetException error) {
+                        @Override
+                        public void onFailed(UrlRequest request, UrlResponseInfo info, CronetException error) {
 
-                       }
-                   });
+                        }
+                    });
 
-               }
-           }
-       });
+                }
+            }
+        });
     }
 
     public void postOrder(JSONObject orderJson, UrlRequest.Callback callback) {
@@ -269,9 +281,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 orderJson.toString().getBytes(StandardCharsets.UTF_8));
 
         UrlRequest request = engine.newUrlRequestBuilder(
-                        ServerUtility.getServerUrl() + "submit_order",
-                        callback,
-                        Executors.newSingleThreadExecutor())
+                ServerUtility.getServerUrl() + "submit_order",
+                callback,
+                Executors.newSingleThreadExecutor())
                 .setHttpMethod("POST")
                 .addHeader("Content-Type", "application/json")
                 .setUploadDataProvider(provider, Executors.newSingleThreadExecutor())
@@ -279,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         request.start();
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.about_us) {

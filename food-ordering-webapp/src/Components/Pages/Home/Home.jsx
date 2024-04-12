@@ -13,8 +13,10 @@ const Home = () => {
   }
 
   const handleOpenMobileApp=()=>{
-
+    var appScheme = "food_ordering_app://";
+    window.location.href = appScheme
   }
+  
   return (
     <VStack className='home'>
       <h2> FOOD ORDERING WEBSITE!</h2>
