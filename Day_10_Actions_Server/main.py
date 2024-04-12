@@ -11,6 +11,7 @@ sock = Sock(app)
 counter = 3
 
 orders = []
+order_ids = []
 wses = []
 ws_clients = {}
 
@@ -75,6 +76,10 @@ orders=[
     }
 ]
 
+order_ids.append(1)
+order_ids.append(2)
+order_ids.append(3)
+
 
 @app.route('/food',methods=['GET'])
 def getFood():
@@ -111,13 +116,16 @@ def send_asset(path):
 @app.route('/submit_order', methods=['POST'])
 def submit_order():
 
-    global counter
     data = request.get_json()
 
     if 'advertisingID' in data and 'items' in data:
         advertising_id = data['advertisingID']
         items = data['items']
-        counter += 1
+        for i in range(1, 1001):
+            if i not in order_ids:
+                counter = i
+                order_ids.append(counter)
+                break
         id = counter
         orders.append({'id': id, 'advertisingID': advertising_id, 'items': items, 'status': 'Processing'})
         response = {'msg': f'Your order {id} is on processing.'}
@@ -140,6 +148,11 @@ def changeOrderStatus():
     for order in orders:
         if order['id'] == int(order_id):
             order['status'] = status
+            if status == 'Done':
+                print(order_ids)
+                order_ids.remove(order['id'])
+                print(order['id'])
+                print(order_ids)
            
     response = {'msg': f'Your order {order_id} is on {status}.'}
     ws = ws_clients.get(advertising_id)

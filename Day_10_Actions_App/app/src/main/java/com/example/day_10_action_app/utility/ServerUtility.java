@@ -7,7 +7,7 @@ import com.example.day_10_action_app.R;
 
 public class ServerUtility {
 
-    private static String ip = "172.16.1.189:8080";
+    private static String ip = "10.0.130.144:8080";
     private static String server_url = "http://"+ip+"/";
     private static String ws_url = "ws://"+ip+"/";
 
