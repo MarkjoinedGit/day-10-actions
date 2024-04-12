@@ -67,6 +67,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
+
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+        String appScheme= String.valueOf(R.string.app_scheme);
+
+        if (data != null && appScheme.equals(data.getScheme())) {
+            Log.i("APP SCHEME","ocee");
+        }
     }
 
     @Override
